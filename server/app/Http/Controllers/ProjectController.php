@@ -4,14 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
+use App\Models\User;
+use App\Services\ProjectService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
+    protected $projectService;
+
+    public function __construct(ProjectService $projectService)
+    {
+        $this->projectService = $projectService;
+    }
+
     public function create(ProjectRequest $request)
     {
         try {
-            $project = Project::create([
+            $project = $this->projectService->createProject([
                 'name' => $request->name,
                 'description' => $request->description,
                 'user_id' => $request->user->id,
@@ -23,56 +34,43 @@ class ProjectController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "Error while creating project.",
-                'error' => $e->getMessage(),
-                'user' => $request->user
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 
-    public function edit(Request $request, $id)
+    public function edit(Request $request, Project $project)
     {
         try {
-            $user_id = $request->user->id;
-            $project = Project::where('id', $id)->where('user_id', $user_id)->first();
+            if (!$this->isOwner($project, Auth::user())) {
+                throw new Exception('Not owner of the project.');
+            };
 
-            if (!$project) {
-                return response()->json([
-                    'message' => "Project not found or you don't have permission to edit it."
-                ], 404);
-            }
-
-            $project->name = $request->name;
-            $project->description = $request->description;
-
-            $project->save();
+            $updatedProject = $this->projectService->updateProject($project, [
+                'user_id' => Auth::user()->id,
+                'name' => $request->name,
+                'description' => $request->description,
+            ]);
 
             return response()->json([
                 'message' => "Project updated successfully.",
-                'project' => $project
+                'project' => $updatedProject
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "Error while editing project.",
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 
-    public function delete(Request $request, $id)
+    public function delete(Request $request, Project $project)
     {
         try {
-            $user_id = $request->user->id;
-            $project = Project::where('id', $id)->where('user_id', $user_id)->first();
+            if (!$this->isOwner($project, Auth::user())) {
+                throw new Exception('Not owner of the project.');
+            };
 
-            if (!$project) {
-                return response()->json([
-                    'message' => "Project not found or you don't have permission to delete it."
-                ], 404);
-            }
-
-
-            $project->delete();
+            $this->projectService->deleteProject($project);
 
             return response()->json([
                 'message' => "Project deleted.",
@@ -82,5 +80,53 @@ class ProjectController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function addTeamMember(Request $request, Project $project)
+    {
+        try {
+            if (!$this->isOwner($project, Auth::user())) {
+                throw new Exception('Not owner of the project.');
+            };
+
+            $this->projectService->addTeamMember($project, $request->teamMemberId);
+            return response()->json([
+                "message" => "Team member added"
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "Error adding new team member.",
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function removeTeamMember(Request $request, Project $project)
+    {
+        try {
+            if (!$this->isOwner($project, Auth::user())) {
+                throw new Exception('Not owner of the project.');
+            };
+
+            $this->projectService->removeTeamMember($project, $request->teamMemberId);
+
+            return response()->json([
+                "message" => "Team member removed successfully."
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "Error removing team member.",
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    private function isOwner(Project $project, User $user)
+    {
+        if ($project->user_id !== $user->id) {
+            return false;
+        }
+
+        return true;
     }
 }

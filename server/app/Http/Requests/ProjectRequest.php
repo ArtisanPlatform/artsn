@@ -27,11 +27,4 @@ class ProjectRequest extends FormRequest
             'description' => 'required|string|max:1000',
         ];
     }
-
-    // protected function prepareForValidation()
-    // {
-    //     if ($this->user()) {
-    //         $this->merge(['user_id' => $this->user()->id]);
-    //     }
-    // }
 }

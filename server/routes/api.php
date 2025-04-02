@@ -5,7 +5,6 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
-
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -14,8 +13,10 @@ Route::prefix('auth')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->middleware(AuthMiddleware::class);
 });
 
-Route::middleware(['projects'])->prefix('project')->group(function () {
+Route::middleware(['auth', 'auth:sanctum'])->prefix('project')->group(function () {
     Route::post('/create', [ProjectController::class, 'create']);
-    Route::put('/edit/{id}', [ProjectController::class, 'edit']);
-    Route::delete('/delete/{id}', [ProjectController::class, 'delete']);
+    Route::put('/{project}/edit', [ProjectController::class, 'edit']);
+    Route::delete('/{project}/delete', [ProjectController::class, 'delete']);
+    Route::post('/{project}/add-member', [ProjectController::class, 'addTeamMember']);
+    Route::post('/{project}/remove-member', [ProjectController::class, 'removeTeamMember']);
 });

@@ -36,31 +36,59 @@ class AuthController extends Controller
 
     public function login(UserLoginRequest $request)
     {
-        try {
-            $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password');
+        $user = User::query()->where('email', $credentials['email'])->first();
 
-            if (!Auth::attempt($credentials)) {
-                return response()->json([
-                    'message' => 'Invalid email or password',
-                ], 400);
-            }
-
-            $user = Auth::user();
-            $accessToken = $user->createToken('access_token', ['*'], now()->addWeek())->plainTextToken;
-            $refreshToken = $user->createToken('refresh_token', ['*'], now()->addDays(8))->plainTextToken;
-
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
-                'message' => 'Login successful',
-                'accessToken' => $accessToken,
-                'refreshToken' => $refreshToken,
-                'user' => $user,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                "message" => "Error while logging user",
-                "error" => $e->getMessage(),
-            ], 500);
+                'message' => 'Invalid email or password',
+            ], 400);
         }
+
+
+        $user->tokens()->delete();; //delete previous tokens.
+        $accessToken = $user->createToken('access_token', ['*'], now()->addWeek())->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', ['*'], now()->addDays(8))->plainTextToken;
+
+        Auth::login($user);
+
+        return response()->json([
+            'message' => 'Login successful',
+            'accessToken' => $accessToken,
+            'refreshToken' => $refreshToken,
+            'user' => Auth::user(),
+        ], 200);
+
+
+
+        // try {
+        //     $credentials = $request->only('email', 'password');
+        //     $user = User::query()->where($credentials)->first();
+        //     if ($user) {
+        //         auth()->login($user);
+        //     }
+        //     // if (!Auth::attempt($credentials)) {
+        //     //     return response()->json([
+        //     //         'message' => 'Invalid email or password',
+        //     //     ], 400);
+        //     // }
+
+        //     // $user = Auth::user();
+        //     $accessToken = $user->createToken('access_token', ['*'], now()->addWeek())->plainTextToken;
+        //     $refreshToken = $user->createToken('refresh_token', ['*'], now()->addDays(8))->plainTextToken;
+
+        //     return response()->json([
+        //         'message' => 'Login successful',
+        //         'accessToken' => $accessToken,
+        //         'refreshToken' => $refreshToken,
+        //         'user' => $user,
+        //     ], 200);
+        // } catch (\Exception $e) {
+        //     return response()->json([
+        //         "message" => "Error while logging user",
+        //         "error" => $e->getMessage(),
+        //     ], 500);
+        // }
     }
 
     public function logout(Request $request)
