@@ -45,18 +45,17 @@ class AuthController extends Controller
             ], 400);
         }
 
-
         $user->tokens()->delete();; //delete previous tokens.
         $accessToken = $user->createToken('access_token', ['*'], now()->addWeek())->plainTextToken;
         $refreshToken = $user->createToken('refresh_token', ['*'], now()->addDays(8))->plainTextToken;
 
-        Auth::login($user);
+        // Auth::login($user);
 
         return response()->json([
             'message' => 'Login successful',
             'accessToken' => $accessToken,
             'refreshToken' => $refreshToken,
-            'user' => Auth::user(),
+            // 'user' => Auth::user(),
         ], 200);
 
 
