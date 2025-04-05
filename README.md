@@ -1,4 +1,4 @@
-# Artisan, task mangement platform for artisans 🎨
+# Artisan, task management platform for artisans 🎨
 
 # Quick Setup Instructions
 
