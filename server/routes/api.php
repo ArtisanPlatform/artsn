@@ -6,6 +6,10 @@ use App\Http\Controllers\TaskController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/hello', function () {
+    return response()->json(['message' => 'Hello, World!']);
+});
+
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
