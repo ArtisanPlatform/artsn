@@ -17,4 +17,4 @@ RUN chown -R www-data:www-data /var/www \
     
 RUN chmod +x /var/www/artisan
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD bash -c "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8000"
