@@ -2,5 +2,5 @@
 import { redirect } from "next/navigation";
 
 export default function ProjectEditPage() {
-  return redirect("/dashboard");
+  return redirect("/artsn/projects/dashboard/12");
 }

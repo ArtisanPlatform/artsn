@@ -1,4 +1,4 @@
-import { Task } from "@/app/projects/dashboard/[projectId]/page";
+import { Task } from "@/app/artsn/projects/kanban/[projectId]/page";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -55,12 +55,12 @@ export function TaskCardPreview({ task }: { task: Task }) {
         <div className="text-xs text-muted-foreground">{task.progress}</div>
         <div className="flex items-center">
           <div className="flex -space-x-2 mr-2">
-            {task.assignees.map((i) => (
-              <Avatar key={i} className="h-5 w-5 border border-background">
-                <AvatarImage src={`/placeholder.svg?height=20&width=20`} />
-                <AvatarFallback className="text-[10px]">U{i}</AvatarFallback>
-              </Avatar>
-            ))}
+            <Avatar className="h-5 w-5 border border-background">
+              <AvatarImage src={`/placeholder.svg?height=20&width=20`} />
+              <AvatarFallback className="text-[10px]">
+                U{task.assigned_user_id}
+              </AvatarFallback>
+            </Avatar>
           </div>
           <div className="flex items-center space-x-1 text-muted-foreground">
             <div className="flex items-center text-xs">

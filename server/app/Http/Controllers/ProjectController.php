@@ -121,6 +121,26 @@ class ProjectController extends Controller
         }
     }
 
+    public function getAllTasks(Project $project)
+    {
+        try {
+            if (!$this->isOwner($project, Auth::user())) {
+                throw new Exception('Not owner of the project.');
+            };
+
+            $tasks =  $this->projectService->getTasks($project);
+
+            return response()->json([
+                "tasks" => $tasks
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "Error gettimg tasks for specified project.",
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     private function isOwner(Project $project, User $user)
     {
         if ($project->user_id !== $user->id) {

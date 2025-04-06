@@ -5,7 +5,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Plus } from "lucide-react";
-import { Column } from "@/app/projects/dashboard/[projectId]/page";
+import { Column } from "@/app/artsn/projects/kanban/[projectId]/page";
 import { TaskCard } from "@/components/task/task-card";
 
 export function KanbanColumn({ column }: { column: Column }) {

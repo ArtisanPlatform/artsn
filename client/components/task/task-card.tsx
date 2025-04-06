@@ -1,4 +1,4 @@
-import { Task } from "@/app/projects/dashboard/[projectId]/page";
+import { Task } from "@/app/artsn/projects/kanban/[projectId]/page";
 import { useSortable } from "@dnd-kit/sortable";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -57,19 +57,25 @@ export function TaskCard({ task }: { task: Task }) {
     >
       <div className="p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <div
-            className={cn(
-              "text-xs px-2 py-0.5 rounded-full",
-              colorMap[task.categoryColor] || "bg-gray-50 text-gray-500"
-            )}
-          >
-            {task.category}
+          <div className="flex gap-2">
+            {task.labels.map((label) => {
+              return (
+                <div
+                  className={cn(
+                    "text-xs px-1 py-0.5 rounded-full",
+                    "bg-blue-50 text-gray-500"
+                  )}
+                >
+                  {label}
+                </div>
+              );
+            })}
           </div>
           <Button variant="ghost" size="icon" className="h-6 w-6">
             <MoreVertical className="h-3 w-3" />
           </Button>
         </div>
-        <h4 className="font-medium text-sm">{task.title}</h4>
+        <h4 className="font-medium text-sm">{task.name}</h4>
         <p className="text-xs text-muted-foreground">{task.description}</p>
       </div>
       <div
@@ -82,12 +88,12 @@ export function TaskCard({ task }: { task: Task }) {
         <div className="text-xs text-muted-foreground">{task.progress}</div>
         <div className="flex items-center">
           <div className="flex -space-x-2 mr-2">
-            {task.assignees.map((i) => (
-              <Avatar key={i} className="h-5 w-5 border border-background">
-                <AvatarImage src={`/placeholder.svg?height=20&width=20`} />
-                <AvatarFallback className="text-[10px]">U{i}</AvatarFallback>
-              </Avatar>
-            ))}
+            <Avatar className="h-5 w-5 border border-background">
+              <AvatarImage src={`/placeholder.svg?height=20&width=20`} />
+              <AvatarFallback className="text-[10px]">
+                U{task.assigned_user_id}
+              </AvatarFallback>
+            </Avatar>
           </div>
           <div className="flex items-center space-x-1 text-muted-foreground">
             <div className="flex items-center text-xs">

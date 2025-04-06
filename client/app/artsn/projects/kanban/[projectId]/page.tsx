@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -18,10 +18,10 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import columnsData from "./cols.json";
 import { KanbanColumn } from "@/components/kanban/kanban-column";
 import { TaskCardPreview } from "@/components/task/task-preview";
 import { createPortal } from "react-dom";
+import axios from "axios";
 
 const viewOptions = [
   { label: "Board", icon: LayoutGrid },
@@ -31,12 +31,11 @@ const viewOptions = [
 
 export type Task = {
   id: string;
-  category: string;
-  categoryColor: string;
-  title: string;
+  labels: string[];
+  name: string;
   description: string;
   progress?: string;
-  assignees: number[];
+  assigned_user_id: number[];
   comments: number;
   attachments: number;
   checklist: number;
@@ -52,8 +51,21 @@ export type Column = {
 };
 
 export default function KanbanPage() {
-  const [columns, setColumns] = useState<Column[]>(columnsData);
+  const [columns, setColumns] = useState<Column[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  const getAllTasks = async () => {
+    try {
+      const res = await axios.get("/api/project/1/tasks");
+      if (res && res.data) {
+        setColumns(res.data.tasks);
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    getAllTasks();
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

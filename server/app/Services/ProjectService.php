@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ProjectService
 {
@@ -73,5 +74,21 @@ class ProjectService
         $project->users()->detach($teamMemberId);
 
         return true;
+    }
+
+    public function getTasks(Project $project)
+    {
+        $tasks = $project->tasks;
+
+        $grouped = $tasks->groupBy('status')->map(function ($tasks, $status) {
+            return [
+                'id' => Str::slug($status),
+                'title' => $status,
+                'count' => $tasks->count(),
+                'tasks' => $tasks->values(),
+            ];
+        })->values();
+
+        return $grouped;
     }
 }

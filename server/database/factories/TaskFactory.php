@@ -19,7 +19,7 @@ class TaskFactory extends Factory
      */
     public function definition(): array
     {
-        $status = ['Pending', 'In Progress', 'On Hold', 'Done'];
+        $status = ['To Do', 'In Progress', 'Need Review', 'Done'];
 
         return [
             'name' => Str::limit($this->faker->unique()->sentence(3), 50),

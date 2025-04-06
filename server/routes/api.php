@@ -24,6 +24,7 @@ Route::middleware(['auth', 'auth:sanctum'])->prefix('project')->group(function (
     Route::delete('/{project}/delete', [ProjectController::class, 'delete']);
     Route::post('/{project}/add-member', [ProjectController::class, 'addTeamMember']);
     Route::post('/{project}/remove-member', [ProjectController::class, 'removeTeamMember']);
+    Route::get('/{project}/tasks', [ProjectController::class, 'getAllTasks']);
 });
 
 Route::middleware(['auth', 'auth:sanctum'])->prefix('task')->group(function () {

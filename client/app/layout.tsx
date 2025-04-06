@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { VerticalSidebar } from "@/components/vertical-sidebar";
-import { Header } from "@/components/header";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,13 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex h-screen bg-background">
-        <VerticalSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header />
-          <div className="flex-1 overflow-auto p-4">{children}</div>
-        </div>
-      </body>
+      <body className="flex h-screen bg-background">{children}</body>
     </html>
   );
 }
