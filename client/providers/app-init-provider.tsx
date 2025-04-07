@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 
 const AppInitProvider = ({ children }: { children: React.ReactNode }) => {
   const [ready, setReady] = useState(false);
-
   const start = async () => {
     await initApp();
     setReady(true);

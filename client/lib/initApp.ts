@@ -1,6 +1,7 @@
 import { useUserStore } from "@/store/useUserStore";
 import axiosInit from "./axiosInit";
 import axios from "axios";
+import { useProjectStore } from "@/store/useProjectStore";
 
 const initApp = async () => {
   axiosInit();
@@ -11,6 +12,7 @@ const initApp = async () => {
   try {
     const { user } = (await axios.get("/api/auth/me")).data;
     useUserStore.getState().setUser(user);
+    useProjectStore.getState().setSelectedProject(user?.projects[0]);
   } catch (err) {
     console.error("initApp error", err);
   }

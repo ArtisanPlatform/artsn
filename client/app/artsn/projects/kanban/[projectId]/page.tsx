@@ -22,6 +22,8 @@ import { KanbanColumn } from "@/components/kanban/kanban-column";
 import { TaskCardPreview } from "@/components/task/task-preview";
 import { createPortal } from "react-dom";
 import axios from "axios";
+import { useProjectStore } from "@/store/useProjectStore";
+import { useParams } from "next/navigation";
 
 const viewOptions = [
   { label: "Board", icon: LayoutGrid },
@@ -53,10 +55,14 @@ export type Column = {
 export default function KanbanPage() {
   const [columns, setColumns] = useState<Column[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const params = useParams();
+  const { selectedProject } = useProjectStore();
 
   const getAllTasks = async () => {
     try {
-      const res = await axios.get("/api/project/1/tasks");
+      const res = await axios.get(
+        `/api/project/${Number(params.projectId)}/tasks`
+      );
       if (res && res.data) {
         setColumns(res.data.tasks);
       }
@@ -215,7 +221,7 @@ export default function KanbanPage() {
       <div className="flex items-center px-4 py-2">
         <div className="flex items-center space-x-2 ">
           <div className="w-6 h-6 bg-gray-200 rounded-md"></div>
-          <h1 className="text-xl font-semibold">Superagenda</h1>
+          <h1 className="text-xl font-semibold">{selectedProject?.name}</h1>
         </div>
         <Progress value={13} className="h-1.5 w-64 mx-4" />
         <span className="text-xs text-muted-foreground">13% complete</span>

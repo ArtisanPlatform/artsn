@@ -1,20 +1,15 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import {
   BarChart2,
   FileText,
   Folder,
-  Grid,
   HelpCircle,
   Home,
   Layers,
-  Search,
-  Users,
   Bell,
-  ChevronRight,
   ChevronLeft,
   ChevronDown,
   Goal,
@@ -34,6 +29,9 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import Image from "next/image";
+import { useUserStore } from "@/store/useUserStore";
+import { useProjectStore } from "@/store/useProjectStore";
+import { usePathname, useRouter } from "next/navigation";
 
 type MenuItem = {
   id: string;
@@ -44,71 +42,65 @@ type MenuItem = {
   badge?: string;
 };
 
-type Project = {
+export type Project = {
   id: string;
   name: string;
-  color: string;
+  description: string;
 };
-
-const projects: Project[] = [
+const menuItems: MenuItem[] = [
   {
-    id: "project-1",
-    name: "Project 1",
-    color: "bg-red-500",
+    id: "dashboard",
+    icon: <Home className="w-4 h-4" />,
+    label: "Dashboard",
+    active: false,
   },
   {
-    id: "project-2",
-    name: "Project 2",
-    color: "bg-blue-500",
+    id: "projects",
+    icon: <Folder className="w-4 h-4" />,
+    label: "Projects",
+    count: 3,
+    active: true,
+  },
+  {
+    id: "analytics",
+    icon: <BarChart2 className="w-4 h-4" />,
+    label: "Analytics",
+    active: false,
+  },
+  {
+    id: "reports",
+    icon: <FileText className="w-4 h-4" />,
+    label: "Reports",
+    active: false,
+    badge: "New",
+  },
+  {
+    id: "extensions",
+    icon: <Layers className="w-4 h-4" />,
+    label: "Extensions",
+    active: false,
+  },
+  {
+    id: "goals",
+    icon: <Goal className="w-4 h-4" />,
+    label: "Goals",
+    count: 12,
+    active: false,
   },
 ];
 
 export function VerticalSidebar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expanded, setExpanded] = useState(true);
-  const [selectedProject, setSelectedProject] = useState<Project>(projects[0]);
+  const { user } = useUserStore();
+  const [selectedProject, setSelectedProject] = useState<Project>(
+    user?.projects[0]
+  );
 
-  const menuItems: MenuItem[] = [
-    {
-      id: "dashboard",
-      icon: <Home className="w-4 h-4" />,
-      label: "Dashboard",
-      active: false,
-    },
-    {
-      id: "projects",
-      icon: <Folder className="w-4 h-4" />,
-      label: "Projects",
-      count: 3,
-      active: true,
-    },
-    {
-      id: "analytics",
-      icon: <BarChart2 className="w-4 h-4" />,
-      label: "Analytics",
-      active: false,
-    },
-    {
-      id: "reports",
-      icon: <FileText className="w-4 h-4" />,
-      label: "Reports",
-      active: false,
-      badge: "New",
-    },
-    {
-      id: "extensions",
-      icon: <Layers className="w-4 h-4" />,
-      label: "Extensions",
-      active: false,
-    },
-    {
-      id: "goals",
-      icon: <Goal className="w-4 h-4" />,
-      label: "Goals",
-      count: 12,
-      active: false,
-    },
-  ];
+  const { setSelectedProject: setSelectedProjectStore } = useProjectStore();
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   const bottomMenuItems: MenuItem[] = [
     {
@@ -173,23 +165,27 @@ export function VerticalSidebar() {
                   <DropdownMenu>
                     <DropdownMenuTrigger className="w-full flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-2 py-1.5 text-sm text-gray-800 border border-gray-200">
                       <div className="flex items-center">
-                        <div
-                          className={`w-4 h-4 rounded-sm ${selectedProject.color} mr-2`}
-                        ></div>
+                        <div className={`w-4 h-4 rounded-sm mr-2`}></div>
                         <span>{selectedProject.name}</span>
                       </div>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-[216px]">
-                      {projects.map((project) => (
+                      {user?.projects?.map((project) => (
                         <DropdownMenuItem
                           key={project.id}
-                          onClick={() => setSelectedProject(project)}
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setSelectedProjectStore(project);
+                            const newPath = pathname.replace(
+                              /\/\d+$/,
+                              `/${project.id}`
+                            );
+                            router.push(newPath);
+                          }}
                           className="flex items-center cursor-pointer"
                         >
-                          <div
-                            className={`w-4 h-4 rounded-sm ${project.color} mr-2`}
-                          ></div>
+                          <div className={`w-4 h-4 rounded-sm mr-2`}></div>
                           <span>{project.name}</span>
                         </DropdownMenuItem>
                       ))}

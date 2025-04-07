@@ -23,7 +23,7 @@ const axiosInit = () => {
       if (error.response?.status === eHttpResponse.Unauthorized) {
         localStorage.clear();
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          window.location.href = "/auth/login";
         }
       }
       return Promise.reject(error);

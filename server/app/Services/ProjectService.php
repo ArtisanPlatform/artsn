@@ -78,17 +78,29 @@ class ProjectService
 
     public function getTasks(Project $project)
     {
+        $statuses = collect([
+            'To Do',
+            'In Progress',
+            'Need Review',
+            'Done',
+        ]);
+
         $tasks = $project->tasks;
 
-        $grouped = $tasks->groupBy('status')->map(function ($tasks, $status) {
+
+        $grouped = $tasks->groupBy('status');
+
+        $result = $statuses->map(function ($status) use ($grouped) {
+            $tasksForStatus = $grouped->get($status, collect());
+
             return [
                 'id' => Str::slug($status),
                 'title' => $status,
-                'count' => $tasks->count(),
-                'tasks' => $tasks->values(),
+                'count' => $tasksForStatus->count(),
+                'tasks' => $tasksForStatus->values(),
             ];
-        })->values();
+        });
 
-        return $grouped;
+        return $result;
     }
 }

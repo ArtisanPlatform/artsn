@@ -132,10 +132,9 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('projects');
         return response()->json([
             "user" => $user,
-            "projects" => $user->projects
         ]);
     }
 }
