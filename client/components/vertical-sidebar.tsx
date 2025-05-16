@@ -96,7 +96,6 @@ export function VerticalSidebar() {
   const [selectedProject, setSelectedProject] = useState<Project>(
     user?.projects[0]
   );
-
   const { setSelectedProject: setSelectedProjectStore } = useProjectStore();
 
   const router = useRouter();
