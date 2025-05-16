@@ -9,6 +9,7 @@ use App\Services\TaskService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class TaskController extends Controller
 {
@@ -22,6 +23,12 @@ class TaskController extends Controller
     public function create(TaskRequest $request, Project $project)
     {
         try {
+
+            $cache_project_key =  "project_tasks_{$project->id}";
+            if(Cache::has($cache_project_key)) {
+                Cache::forget($cache_project_key);
+            }
+
             $project = $this->taskService->createTask([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -34,6 +41,7 @@ class TaskController extends Controller
 
             return response()->json([
                 'message' => "Task created successfully",
+                'task' => Auth::user()->id
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -47,6 +55,10 @@ class TaskController extends Controller
         try {
             if (!$this->isOwner($project, $task)) {
                 throw new Exception('Not owner of the project / task.');
+            }
+            $cache_project_key =  "project_tasks_{$project->id}";
+            if(Cache::has($cache_project_key)) {
+                Cache::forget($cache_project_key);
             }
 
             $this->taskService->editTask($task, [
@@ -75,6 +87,12 @@ class TaskController extends Controller
             if (!$this->isOwner($project, $task)) {
                 throw new Exception("Not owner of the task.");
             }
+
+            $cache_project_key =  "project_tasks_{$project->id}";
+            if(Cache::has($cache_project_key)) {
+                Cache::forget($cache_project_key);
+            }
+
             $this->taskService->deleteTask($project, $task);
 
             return response()->json([
@@ -96,6 +114,11 @@ class TaskController extends Controller
                 throw new Exception("Not owner of the task.");
             }
 
+            $cache_project_key =  "project_tasks_{$project->id}";
+            if(Cache::has($cache_project_key)) {
+                Cache::forget($cache_project_key);
+            }
+
             $this->taskService->assignTaskToUser($project, $task, $assign_user_id);
 
             return response()->json([
@@ -114,6 +137,11 @@ class TaskController extends Controller
         try {
             if (!$this->isOwner($project, $task)) {
                 throw new Exception("Not owner of the task.");
+            }
+
+            $cache_project_key =  "project_tasks_{$project->id}";
+            if(Cache::has($cache_project_key)) {
+                Cache::forget($cache_project_key);
             }
 
             $this->taskService->removeTaskFromUser($project, $task);

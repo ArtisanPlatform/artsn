@@ -9,6 +9,8 @@ use App\Services\ProjectService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ProjectController extends Controller
 {
@@ -128,7 +130,11 @@ class ProjectController extends Controller
                 throw new Exception('Not owner of the project.');
             };
 
-            $tasks =  $this->projectService->getTasks($project);
+            $cacheKey = "project_tasks_{$project->id}";
+
+            $tasks = Cache::remember($cacheKey, 600, function () use ($project) {
+                return $this->projectService->getTasks($project);
+            });
 
             return response()->json([
                 "tasks" => $tasks

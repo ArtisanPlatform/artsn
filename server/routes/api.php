@@ -4,11 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Middleware\AuthMiddleware;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/hello', function () {
-    return response()->json(['message' => 'Hello, World!']);
-});
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -16,6 +14,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->middleware(AuthMiddleware::class);
     Route::get('/me', [AuthController::class, 'me'])->middleware(AuthMiddleware::class);
+    Route::put('/update', [AuthController::class, 'update'])->middleware(AuthMiddleware::class);
+    Route::put('/profile-image', [AuthController::class, 'updateImage'])->middleware(AuthMiddleware::class);
 });
 
 Route::middleware(['auth', 'auth:sanctum'])->prefix('project')->group(function () {

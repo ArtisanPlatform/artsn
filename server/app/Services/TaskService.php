@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\Task;
-use App\Models\User;
 use Exception;
 
 class TaskService
